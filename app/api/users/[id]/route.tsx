@@ -20,7 +20,7 @@ export async function GET(
 // Update Function
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: number}}) {
+  { params }: { params: { id: string}}) {
     const body = await request.json();
     // No name validation
     const validation = schema.safeParse(body)
@@ -29,11 +29,24 @@ export async function PUT(
     if (!validation.success)
       return NextResponse.json(validation.error.errors, { status: 400})
 
-    // // No matching id (Hard limit with no real DB)
-    if (params.id > 10)
-      return NextResponse.json({ error: 'User not found'}, { status: 400})
+    // Check user ID
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(params.id)}
+    })
 
-    return NextResponse.json({ id: 1, name: body.name})
+    if (!user)
+      return NextResponse.json({ error: 'User not found'}, { status: 400})
+    
+    // update in Prisma
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id},
+      data: {
+        name: body.name,
+        email: body.email
+      }
+    })
+
+    return NextResponse.json(updatedUser)
   }
 
   // Delete a user
