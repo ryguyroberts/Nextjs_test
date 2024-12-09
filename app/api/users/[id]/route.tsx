@@ -1,3 +1,4 @@
+import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 export function GET(
@@ -23,4 +24,16 @@ export async function PUT(
       return NextResponse.json({ error: 'User not found'}, { status: 400})
 
     return NextResponse.json({ id: 1, name: body.name})
+  }
+
+  // Delete a user
+  export function DELETE(
+    request: NextRequest,
+  { params }: { params: { id: number}}) {
+    // In real DB check for user, hard limit
+    if (params.id > 10)
+      return NextResponse.json({ error : 'User not found'}, { status: 404 })
+
+    // user found -> delete em
+    return NextResponse.json({ message: 'User deleted'})
   }
