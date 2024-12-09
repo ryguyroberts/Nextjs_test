@@ -5,15 +5,15 @@ import prisma from "@/prisma/client";
 
 export async function GET(
   request : NextRequest,
-  { params }: { params: { id: number}}) {
+  { params }: { params: { id: string}}) {
 
     const user = await prisma.user.findUnique({
-      where: { id: params.id }
+      where: { id: parseInt(params.id) }
     });
 
     if (!user)
       return NextResponse.json({ error: 'User not Found'}, { status: 404});
-    return NextResponse.json({id: 1, name: 'Ryan'});
+    return NextResponse.json(user);
   }
 
 
