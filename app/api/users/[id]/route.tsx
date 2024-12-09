@@ -1,5 +1,6 @@
-import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
+import schema from "../schema";
+
 
 export function GET(
   request : NextRequest,
@@ -16,10 +17,13 @@ export async function PUT(
   { params }: { params: { id: number}}) {
     const body = await request.json();
     // No name validation
-    if (!body.name)
-      return NextResponse.json({ error: 'Name is required'}, { status: 400})
+    const validation = schema.safeParse(body)
 
-    // No matching id (Hard limit with no real DB)
+    // Zod validation
+    if (!validation.success)
+      return NextResponse.json(validation.error.errors, { status: 400})
+
+    // // No matching id (Hard limit with no real DB)
     if (params.id > 10)
       return NextResponse.json({ error: 'User not found'}, { status: 400})
 
