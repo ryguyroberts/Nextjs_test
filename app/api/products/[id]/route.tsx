@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 import schema from "../schema";
 import prisma from "@/prisma/client";
 
@@ -54,14 +54,23 @@ export async function PUT(
   }
 
 // Delete product
-export function DELETE(
+export async function DELETE(
   request: NextRequest,
-  { params } : { params: { id: number}}) {
-    // hard limit for existing id
-    if (params.id > 10)
-      return NextResponse.json({error: 'Product not found'}, {status: 404})
+  { params } : { params: { id: string}}) {
+
+    //Check product ID
+    const product = await prisma.product.findUnique({
+      where: {id : parseInt(params.id)}
+    });
+
+    if (!product)
+      return NextResponse.json({error: 'Product not found'}, {status: 404});
 
     // Product found delete it
-    return NextResponse.json({ message: 'Product Deleted'})
+    await prisma.product.delete({
+      where: { id: product.id}
+    });
+
+    return NextResponse.json({ message: 'Product Deleted'});
   }
 
