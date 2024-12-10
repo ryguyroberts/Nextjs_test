@@ -8,10 +8,12 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(users);
 }
 
+// Create function
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const validation = schema.safeParse(body);
 
+  // Zod validation
   if(!validation.success)
     return NextResponse.json(validation.error.errors, { status : 400 })
 
